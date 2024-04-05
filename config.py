@@ -8,10 +8,9 @@ def get_config(profile):
     with open(Path.home() / ".o365-auth-config.toml", "rb") as f:
        toplevel_data = tomllib.load(f)
 
-    if profile not in toplevel_data:
-        sys.exit("Invalid profile specified.")
 
-    config_data = toplevel_data[profile]
+    default_data = toplevel_data["default"]
+    config_data = default_data | toplevel_data.get(profile, {})
     cache_path = Path.home() / ".cache/o365-oauth" / profile
     cache_path.mkdir(parents=True, exist_ok=True)
 
