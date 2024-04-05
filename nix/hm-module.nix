@@ -30,6 +30,6 @@ in
   };
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
-    home.file.".o365-auth-config".text = cfg.config;
+    home.file.".o365-auth-config.toml".text = cfg.config;
   };
 }
