@@ -1,8 +1,16 @@
-ClientId = "08162f7c-0fd2-4200-a84a-f25a4db0b584"
-ClientSecret = "TxRBilcHdC6WGBee]fs?QR:SJ8nI[g82"
-Scopes = ['https://outlook.office.com/IMAP.AccessAsUser.All','https://outlook.office.com/SMTP.Send']
-RefreshTokenFileName = "imap_smtp_refresh_token"
-AccessTokenFileName = "imap_smtp_access_token"
+from pathlib import Path
+import tomllib
 
-# Optionally specify a tenantId here: "https://login.microsoftonline.com/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/"
-Authority = None 
+with open(Path.home() / ".o365-oauth-config.toml", "rb") as f:
+    config_data = tomllib.load(f)
+
+cache_path = Path.home() / ".chache/o365-oauth"
+cache_path.mkdir(parents=True, exist_ok=True)
+
+ClientId = config_data["ClientId"]
+ClientSecret = config_data["ClientSecret"]
+Scopes = config_data["Scopes"]
+RefreshTokenFileName = cache_path / "imap_smtp_refresh_token"
+AccessTokenFileName = cache_path / "imap_smtp_access_token"
+
+Authority = config_data["Authority"] or None
