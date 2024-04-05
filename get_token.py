@@ -8,14 +8,22 @@ import threading
 import urllib.parse
 import webbrowser
 
+if len(sys.argv) > 1:
+    profile = sys.argv[1]
+else:
+    sys.exit("Please provide a profile name as the first argument.")
+
+
+profile_config = config.get_config(profile)
+
 
 redirect_uri = "http://localhost:8745/"
 
 # We use the cache to extract the refresh token
 cache = SerializableTokenCache()
-app = ConfidentialClientApplication(config.ClientId, client_credential=config.ClientSecret, token_cache=cache, authority=config.Authority)
+app = ConfidentialClientApplication(profile_config.ClientId, client_credential=profile_config.ClientSecret, token_cache=cache, authority=profile_config.Authority)
 
-url = app.get_authorization_request_url(config.Scopes, redirect_uri=redirect_uri)
+url = app.get_authorization_request_url(profile_config.Scopes, redirect_uri=redirect_uri)
 
 # webbrowser.open may fail silently
 print("Navigate to the following url in a web browser, if doesn't open automatically:")
@@ -62,7 +70,7 @@ if code == '':
     i = resp.find('code') + 5
     code = resp[i : resp.find('&', i)] if i > 4 else resp
 
-token = app.acquire_token_by_authorization_code(code, config.Scopes, redirect_uri=redirect_uri)
+token = app.acquire_token_by_authorization_code(code, profile_config.Scopes, redirect_uri=redirect_uri)
 
 print()
 
@@ -70,10 +78,10 @@ if 'error' in token:
     print(token)
     sys.exit("Failed to get access token")
 
-with open(config.RefreshTokenFileName, 'w') as f:
-    print(f'Refresh token acquired, writing to file {config.RefreshTokenFileName}')
+with open(profile_config.RefreshTokenFileName, 'w') as f:
+    print(f'Refresh token acquired, writing to file {profile_config.RefreshTokenFileName}')
     f.write(token['refresh_token'])
 
-with open(config.AccessTokenFileName, 'w') as f:
-    print(f'Access token acquired, writing to file {config.AccessTokenFileName}')
+with open(profile_config.AccessTokenFileName, 'w') as f:
+    print(f'Access token acquired, writing to file {profile_config.AccessTokenFileName}')
     f.write(token['access_token'])

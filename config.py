@@ -1,16 +1,24 @@
 from pathlib import Path
 import tomllib
+from types import SimpleNamespace
+import sys
 
-with open(Path.home() / ".o365-oauth-config.toml", "rb") as f:
-    config_data = tomllib.load(f)
 
-cache_path = Path.home() / ".chache/o365-oauth"
-cache_path.mkdir(parents=True, exist_ok=True)
+def get_config(profile):
+    with open(Path.home() / ".o365-auth-config.toml", "rb") as f:
+       toplevel_data = tomllib.load(f)
 
-ClientId = config_data["ClientId"]
-ClientSecret = config_data["ClientSecret"]
-Scopes = config_data["Scopes"]
-RefreshTokenFileName = cache_path / "imap_smtp_refresh_token"
-AccessTokenFileName = cache_path / "imap_smtp_access_token"
+    if profile not in toplevel_data:
+        sys.exit("Invalid profile specified.")
 
-Authority = config_data["Authority"] or None
+    config_data = toplevel_data[profile]
+    cache_path = Path.home() / ".cache/o365-oauth" / profile
+    cache_path.mkdir(parents=True, exist_ok=True)
+
+    return SimpleNamespace(
+        ClientId = config_data["ClientId"],
+        ClientSecret = config_data["ClientSecret"],
+        Scopes = config_data["Scopes"],
+        RefreshTokenFileName = cache_path / "imap_smtp_refresh_token",
+        AccessTokenFileName = cache_path / "imap_smtp_access_token",
+        Authority = config_data["Authority"] or None)
