@@ -7,8 +7,8 @@ multi-configuration and encryption support. Furthermore token
 expiration is now being taken into account. *This has been hacked
 together in an afternoon and works for me. No guarantees provided :).*
 
-*If you want to see this in action with `mbsync + msmtp` head over
-[here](https://github.com/vale981/nix-config/blob/master/home/hiro/software/email/default.nix)
+**If you want to see this in action with `mbsync + msmtp` head over
+[here](https://github.com/vale981/nix-config/blob/master/home/hiro/software/email/default.nix)**
 
 The tool is configured by `~/.o365-auth-config.toml` (see
 `config.toml`) in this repo. The `[security]` section has only one
