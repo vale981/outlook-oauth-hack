@@ -30,6 +30,7 @@
               install -Dm755 ${./get_token.py} $out/bin/o365-get-token
               install -Dm755 ${./refresh_token.py} $out/bin/o365-refresh-token
               install -Dm755 ${./config.py} $out/bin/config.py
+              install -Dm755 ${./config.py} $out/bin/o365-get-config
             '';
           };
         });

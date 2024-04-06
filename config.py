@@ -22,3 +22,8 @@ def get_config(profile):
         AccessTokenFileName = cache_path / "imap_smtp_access_token",
         Authority = config_data["Authority"] or None,
         Timeout = config_data.get("Timeout", 60 * 60))
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        sys.exit(f"Usage: {sys.argv[0]} <profile> <key>")
+    print(get_config(sys.argv[1]).__dict__[sys.argv[2]])
