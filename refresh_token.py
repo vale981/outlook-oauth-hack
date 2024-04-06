@@ -4,7 +4,7 @@ import config
 import sys
 import os
 import time
-
+import json
 print_access_token = True
 
 if len(sys.argv) > 1:
@@ -18,34 +18,29 @@ profile_config = config.get_config(profile)
 cache = SerializableTokenCache()
 app = ConfidentialClientApplication(profile_config.ClientId, client_credential=profile_config.ClientSecret, token_cache=cache, authority=profile_config.Authority)
 
-if profile_config.AccessTokenFileName.exists() and print_access_token:
-    st = os.stat(profile_config.AccessTokenFileName)
-    if (time.time()-st.st_mtime) < profile_config.Timeout:
-        with open(profile_config.AccessTokenFileName, 'r') as f:
-            print(f.read())
 
-            sys.exit(0)
-
-# check if file exists and error out if it doesn't
-try:
-    old_refresh_token = open(profile_config.RefreshTokenFileName,'r').read()
-
-except FileNotFoundError:
+if not profile_config.CacheFile.exists():
     sys.exit("Please get the initial token by running `o365-get-token` first.")
 
+token_cache = json.loads(profile_config.CacheFile.read_text())
 
-token = app.acquire_token_by_refresh_token(old_refresh_token,profile_config.Scopes)
+st = os.stat(profile_config.CacheFile)
+if (time.time()-st.st_mtime) < token_cache["expires_in"]:
+    print(token_cache["access_token"])
+    sys.exit(0)
+
+
+token = app.acquire_token_by_refresh_token(token_cache["refresh_token"],profile_config.Scopes)
 
 if 'error' in token:
     print(token)
     sys.exit("Failed to get access token")
 
-# you're supposed to save the old refresh token each time
-with open(profile_config.RefreshTokenFileName, 'w') as f:
-    #f.write(cache.find('RefreshToken')[0]['secret'])
-    f.write(token['refresh_token'])
 
-with open(profile_config.AccessTokenFileName, 'w') as f:
-    f.write(token['access_token'])
+# you're supposed to save the old refresh token each time
+with open(profile_config.CacheFile, 'w') as f:
+    json.dump({'refresh_token': token['refresh_token'],
+               'expires_in': token['expires_in'],
+               'access_token': token['access_token']}, f)
     if print_access_token:
         print(token['access_token'])

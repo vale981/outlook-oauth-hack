@@ -7,7 +7,7 @@ import sys
 import threading
 import urllib.parse
 import webbrowser
-
+import json
 if len(sys.argv) > 1:
     profile = sys.argv[1]
 else:
@@ -78,10 +78,8 @@ if 'error' in token:
     print(token)
     sys.exit("Failed to get access token")
 
-with open(profile_config.RefreshTokenFileName, 'w') as f:
-    print(f'Refresh token acquired, writing to file {profile_config.RefreshTokenFileName}')
-    f.write(token['refresh_token'])
 
-with open(profile_config.AccessTokenFileName, 'w') as f:
-    print(f'Access token acquired, writing to file {profile_config.AccessTokenFileName}')
-    f.write(token['access_token'])
+with open(profile_config.CacheFile, 'w') as f:
+    json.dump({'refresh_token': token['refresh_token'],
+               'expires_in': token['expires_in'],
+               'access_token': token['access_token']}, f)
