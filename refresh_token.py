@@ -4,7 +4,7 @@ import config
 import sys
 import os
 import time
-import json
+
 print_access_token = True
 
 if len(sys.argv) > 1:
@@ -19,10 +19,9 @@ cache = SerializableTokenCache()
 app = ConfidentialClientApplication(profile_config.ClientId, client_credential=profile_config.ClientSecret, token_cache=cache, authority=profile_config.Authority)
 
 
-if not profile_config.CacheFile.exists():
+token_cache = config.get_cache(profile_config)
+if not token_cache:
     sys.exit("Please get the initial token by running `o365-get-token` first.")
-
-token_cache = json.loads(profile_config.CacheFile.read_text())
 
 st = os.stat(profile_config.CacheFile)
 if (time.time()-st.st_mtime) < token_cache["expires_in"]:
@@ -37,10 +36,6 @@ if 'error' in token:
     sys.exit("Failed to get access token")
 
 
-# you're supposed to save the old refresh token each time
-with open(profile_config.CacheFile, 'w') as f:
-    json.dump({'refresh_token': token['refresh_token'],
-               'expires_in': token['expires_in'],
-               'access_token': token['access_token']}, f)
-    if print_access_token:
-        print(token['access_token'])
+config.write_cache(profile_config, token)
+if print_access_token:
+    print(token['access_token'])

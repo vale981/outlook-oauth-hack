@@ -22,7 +22,7 @@
             name = "o365-auth";
             propagatedBuildInputs = [
               (pkgs.python3.withPackages (pythonPackages: with pythonPackages; [
-                msal
+                msal python-gnupg
               ]))
             ];
             dontUnpack = true;

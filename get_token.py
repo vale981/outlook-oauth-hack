@@ -78,8 +78,4 @@ if 'error' in token:
     print(token)
     sys.exit("Failed to get access token")
 
-
-with open(profile_config.CacheFile, 'w') as f:
-    json.dump({'refresh_token': token['refresh_token'],
-               'expires_in': token['expires_in'],
-               'access_token': token['access_token']}, f)
+config.write_cache(profile_config, token)

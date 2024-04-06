@@ -17,6 +17,9 @@ in
       type = types.package;
       default = package;
     };
+    passwordPath = mkOption {
+      type = types.str;
+    };
     config = mkOption {
       type = types.str;
       default = ''
@@ -25,12 +28,14 @@ in
         ClientSecret = "TxRBilcHdC6WGBee]fs?QR:SJ8nI[g82"
         Scopes = ['https://outlook.office.com/IMAP.AccessAsUser.All','https://outlook.office.com/SMTP.Send']
         Authority = false
-        Timeout = 3600
       '';
     };
   };
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
-    home.file.".o365-auth-config.toml".text = cfg.config;
+    home.file.".o365-auth-config.toml".text = cfg.config + ''
+[security]
+PasswordPath = "${cfg.passwordPath}"
+'';
   };
 }
