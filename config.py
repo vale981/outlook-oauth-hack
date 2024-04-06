@@ -20,4 +20,5 @@ def get_config(profile):
         Scopes = config_data["Scopes"],
         RefreshTokenFileName = cache_path / "imap_smtp_refresh_token",
         AccessTokenFileName = cache_path / "imap_smtp_access_token",
-        Authority = config_data["Authority"] or None)
+        Authority = config_data["Authority"] or None,
+        Timeout = config_data.get("Timeout", 60 * 60))

@@ -2,10 +2,10 @@
 from msal import ConfidentialClientApplication, SerializableTokenCache
 import config
 import sys
-
+import os
+import time
 
 print_access_token = True
-# get first command line argument
 
 if len(sys.argv) > 1:
     profile = sys.argv[1]
@@ -18,10 +18,18 @@ profile_config = config.get_config(profile)
 cache = SerializableTokenCache()
 app = ConfidentialClientApplication(profile_config.ClientId, client_credential=profile_config.ClientSecret, token_cache=cache, authority=profile_config.Authority)
 
+if profile_config.AccessTokenFileName.exists() and print_access_token:
+    st = os.stat(profile_config.AccessTokenFileName)
+    if (time.time()-st.st_mtime) < profile_config.Timeout:
+        with open(profile_config.AccessTokenFileName, 'r') as f:
+            print(f.read())
+
+            sys.exit(0)
 
 # check if file exists and error out if it doesn't
 try:
     old_refresh_token = open(profile_config.RefreshTokenFileName,'r').read()
+
 except FileNotFoundError:
     sys.exit("Please get the initial token by running `o365-get-token` first.")
 

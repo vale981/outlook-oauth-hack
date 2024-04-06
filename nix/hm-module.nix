@@ -25,6 +25,7 @@ in
         ClientSecret = "TxRBilcHdC6WGBee]fs?QR:SJ8nI[g82"
         Scopes = ['https://outlook.office.com/IMAP.AccessAsUser.All','https://outlook.office.com/SMTP.Send']
         Authority = false
+        Timeout = 3600
       '';
     };
   };
